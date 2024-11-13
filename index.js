@@ -99,7 +99,7 @@ exports.findOne = function (search, options, callback) {
   exports.query(search, options, function (err, result) {
     if (err) { return callback(err); }
 
-    if (result.response && Array.isArray(result.response.docs)) {
+    if (result.response && Array.isArray(result.response.docs) && result.response.docs.length === 1) {
       callback(null, result.response.docs[0]);
     } else {
       callback(new Error('unexpected result, documents not found'));
@@ -130,9 +130,13 @@ exports.query = function (search, options, callback) {
   }
 
   // query link
-  let url = options.core
-    ? `http://ccsdsolrvip.in2p3.fr:8080/solr/${options.core}/select?&wt=json&q=${encodeURIComponent(query)}`
-    : `http://api.archives-ouvertes.fr/search/?wt=json&q=${encodeURIComponent(query)}`;
+  const host = options.host || "http://api.archives-ouvertes.fr";
+  let url =
+    options.core === "hal"
+      ? `${host}/solr/hal/api/selectall?wt=json&q=${encodeURIComponent(query)}`
+      : `${host}/${options.core || "search"}/?wt=json&q=${encodeURIComponent(
+          query
+        )}`;
 
   // for convenience, add fields as an alias for fl
   if (options.fields) {
@@ -146,7 +150,8 @@ exports.query = function (search, options, callback) {
 
   // append options to the query (ex: start=1, rows=10)
   for (const p in options) {
-    url += `&${p}=${options[p]}`;
+    if (p !== "core")
+      url += `&${p}=${options[p]}`;
   }
   axios.get(url, requestOptions).then(response => {
     if (response.status !== 200) {

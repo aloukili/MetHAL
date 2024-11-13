@@ -108,4 +108,12 @@ Have a look at the [API documentation](http://api.archives-ouvertes.fr/docs/sear
     <td>fl / fields</td>
     <td>Fields to return. Ex: "*", "docid, country_s", ["docid", "country_s"]</td>
   </tr>
+  <tr>
+    <td>host</td>
+    <td>Host of the API (optional default to public API: http://api.archives-ouvertes.fr)</td>
+  </tr>
+  <tr>
+    <td>core</td>
+    <td>API core: `search`, `ref/instance`, `hal` (hal team internal use). Default to `search`.</td>
+  </tr>
 </table>
